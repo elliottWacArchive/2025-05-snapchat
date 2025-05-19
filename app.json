@@ -1,4 +1,5 @@
 {
-  "name": "snapchat",
-  "displayName": "snapchat"
+    "name": "snapchat",
+    "displayName": "snapchat",
+    "icon": "assets/images/logo.png"
 }
