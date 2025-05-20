@@ -5,26 +5,70 @@ import {
     TextInput,
     TouchableOpacity,
     StyleSheet,
-    Image,
     KeyboardAvoidingView,
     Platform,
     SafeAreaView,
+    ActivityIndicator,
+    Alert,
 } from "react-native";
-
+import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 const LoginScreen = ({ navigation }: any) => {
+    const { setAuthData } = React.useContext(AuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
+        setErrorMessage("");
         if (!email || !password) {
             setErrorMessage("Veuillez remplir tous les champs");
             return;
         }
 
-        console.log("Tentative de connexion avec:", email, password);
+        const userData = {
+            email: email,
+            password: password,
+        };
 
-        navigation.navigate("Main");
+        const header = {
+            "Content-Type": "application/json",
+            "x-api-key":
+                "CLE_API_SUPPRIMEE",
+        };
+        setLoading(true);
+        try {
+            const response = await axios.put(
+                "https://snapchat.epihub.eu/user",
+                userData,
+                { headers: header }
+            );
+            console.log("Login response:", response);
+
+            const token = response.data.data.token;
+            const username = response.data.data.username;
+            const userId = response.data.data._id;
+
+            console.log("Token:", token);
+            console.log("Username:", username);
+            console.log("User ID:", userId);
+
+            await setAuthData(token, username, userId);
+            navigation.navigate("Main");
+        } catch (error) {
+            console.error("Erreur de connexion:", error);
+            if (axios.isAxiosError(error) && error.response) {
+                const errorData = error.response.data;
+                if (errorData && errorData.message) {
+                    setErrorMessage(errorData.message);
+                } else {
+                    setErrorMessage("Erreur de connexion");
+                }
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -61,8 +105,13 @@ const LoginScreen = ({ navigation }: any) => {
                 <TouchableOpacity
                     style={styles.loginButton}
                     onPress={handleLogin}
+                    disabled={loading}
                 >
-                    <Text style={styles.loginButtonText}>Se connecter</Text>
+                    {loading ? (
+                        <ActivityIndicator color="white" />
+                    ) : (
+                        <Text style={styles.loginButtonText}>Se connecter</Text>
+                    )}
                 </TouchableOpacity>
 
                 <View style={styles.footer}>

@@ -84,8 +84,6 @@ const RegisterScreen = ({ navigation }: any) => {
         } finally {
             setLoading(false);
         }
-
-        // console.log("Inscription avec:", username, email, password);
     };
 
     return (
