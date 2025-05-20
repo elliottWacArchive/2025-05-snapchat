@@ -9,7 +9,10 @@ import {
     Platform,
     SafeAreaView,
     ScrollView,
+    ActivityIndicator,
+    Alert,
 } from "react-native";
+import axios from "axios";
 
 const RegisterScreen = ({ navigation }: any) => {
     const [username, setUsername] = useState("");
@@ -17,8 +20,10 @@ const RegisterScreen = ({ navigation }: any) => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
+        setErrorMessage("");
         if (!username || !email || !password || !confirmPassword) {
             setErrorMessage("Veuillez remplir tous les champs");
             return;
@@ -35,9 +40,52 @@ const RegisterScreen = ({ navigation }: any) => {
             return;
         }
 
-        console.log("Inscription avec:", username, email, password);
+        const header = {
+            "Content-Type": "application/json",
+            "x-api-key":
+                "CLE_API_SUPPRIMEE",
+        };
 
-        navigation.navigate("Login");
+        const userData = {
+            email: email,
+            username: username,
+            profilePicture: "",
+            password: password,
+        };
+
+        setLoading(true);
+        try {
+            const response = await axios.post(
+                "https://snapchat.epihub.eu/user",
+                userData,
+                { headers: header }
+            );
+            console.log("Réponse de l'API:", response.data);
+
+            Alert.alert(
+                "Inscription réussie",
+                "Votre compte a été créé avec succès.",
+                [
+                    {
+                        text: "OK",
+                        onPress: () => {
+                            navigation.navigate("Login");
+                        },
+                    },
+                ]
+            );
+        } catch (error) {
+            console.error("Erreur lors de l'inscription:", error);
+            if (axios.isAxiosError(error) && error.response) {
+                setErrorMessage(error.response.data.message);
+            } else {
+                setErrorMessage("Une erreur est survenue. Veuillez réessayer.");
+            }
+        } finally {
+            setLoading(false);
+        }
+
+        // console.log("Inscription avec:", username, email, password);
     };
 
     return (
@@ -91,10 +139,15 @@ const RegisterScreen = ({ navigation }: any) => {
                     <TouchableOpacity
                         style={styles.registerButton}
                         onPress={handleRegister}
+                        disabled={loading}
                     >
-                        <Text style={styles.registerButtonText}>
-                            S'inscrire
-                        </Text>
+                        {loading ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text style={styles.registerButtonText}>
+                                S'inscrire
+                            </Text>
+                        )}
                     </TouchableOpacity>
 
                     <View style={styles.footer}>
