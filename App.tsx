@@ -6,6 +6,7 @@ import LoginScreen from "./screens/Login";
 import RegisterScreen from "./screens/Register";
 import MainScreen from "./screens/Main";
 import { ActivityIndicator, View } from "react-native";
+// import { CameraProvider } from "react-native-camera-hooks";
 
 type RootStackParamList = {
     Login: undefined;
@@ -57,9 +58,11 @@ function Navigation() {
 
 function App(): React.JSX.Element {
     return (
+        // <CameraProvider>
         <AuthProvider>
             <Navigation />
         </AuthProvider>
+        // </CameraProvider>
     );
 }
 
