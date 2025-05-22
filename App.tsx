@@ -5,6 +5,7 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 import LoginScreen from "./screens/Login";
 import RegisterScreen from "./screens/Register";
 import MainScreen from "./screens/Main";
+import CameraScreen from "./screens/Camera";
 import { ActivityIndicator, View } from "react-native";
 // import { CameraProvider } from "react-native-camera-hooks";
 
@@ -12,6 +13,7 @@ type RootStackParamList = {
     Login: undefined;
     Register: undefined;
     Main: undefined;
+    Camera: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -49,6 +51,11 @@ function Navigation() {
                 <Stack.Screen
                     name="Main"
                     component={MainScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Camera"
+                    component={CameraScreen}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>

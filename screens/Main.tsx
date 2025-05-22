@@ -8,120 +8,26 @@ import {
     Modal,
     SafeAreaView,
     Platform,
+    Button,
     Alert,
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
-import {
-    Camera,
-    useCameraDevices,
-    CameraPermissionStatus,
-} from "react-native-vision-camera";
 
 const Main = ({ navigation }: any) => {
     const { userName } = React.useContext(AuthContext);
-    const [isCameraOpen, setIsCameraOpen] = useState(false);
-    const [capturedImage, setCapturedImage] = useState<string | null>(null);
-    const camera = useRef<Camera>(null);
-    const devices = useCameraDevices();
-    // @ts-ignore
-    const device = devices.back;
-    const [cameraPermission, setCameraPermission] =
-        useState<CameraPermissionStatus>();
-
-    useEffect(() => {
-        (async () => {
-            const status = await Camera.getCameraPermissionStatus();
-            setCameraPermission(status);
-
-            if (status !== "granted") {
-                const newStatus = await Camera.requestCameraPermission();
-                setCameraPermission(newStatus);
-
-                if (newStatus !== "granted") {
-                    Alert.alert(
-                        "Permission refusée",
-                        "Accès à la caméra nécessaire pour cette fonctionnalité"
-                    );
-                }
-            }
-        })();
-    }, []);
-
-    const handleOpenCamera = () => {
-        setIsCameraOpen(true);
-    };
-
-    const handleCloseCamera = () => {
-        setIsCameraOpen(false);
-    };
-
-    const handleCapture = async () => {
-        if (camera.current) {
-            try {
-                const photo = await camera.current.takePhoto();
-                const uri = `file://${photo.path}`;
-                setCapturedImage(uri);
-                setIsCameraOpen(false);
-                console.log("Photo capturée:", uri);
-            } catch (error) {
-                console.error("Erreur lors de la capture:", error);
-            }
-        }
-    };
 
     return (
         <View style={styles.container}>
             <Text style={styles.welcomeText}>
                 Bienvenue, {userName || "User"}!
             </Text>
-
-            {capturedImage && (
-                <View style={styles.imageContainer}>
-                    <Image
-                        source={{ uri: capturedImage }}
-                        style={styles.capturedImage}
-                    />
-                </View>
-            )}
-
             <TouchableOpacity
-                style={styles.cameraButton}
-                onPress={handleOpenCamera}
+                onPress={() => {
+                    navigation.navigate("Camera");
+                }}
             >
-                <Text style={styles.cameraButtonText}>Prendre une photo</Text>
+                <Text>Camera</Text>
             </TouchableOpacity>
-
-            <Modal
-                visible={isCameraOpen}
-                animationType="slide"
-                onRequestClose={handleCloseCamera}
-            >
-                <SafeAreaView style={styles.cameraContainer}>
-                    {device && (
-                        <Camera
-                            ref={camera}
-                            style={styles.camera}
-                            device={device}
-                            isActive={isCameraOpen}
-                            photo={true}
-                        />
-                    )}
-
-                    <View style={styles.cameraControlsContainer}>
-                        <TouchableOpacity
-                            style={styles.closeButton}
-                            onPress={handleCloseCamera}
-                        >
-                            <Text style={styles.closeButtonText}>Fermer</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.captureButton}
-                            onPress={handleCapture}
-                        />
-                    </View>
-                </SafeAreaView>
-            </Modal>
         </View>
     );
 };
