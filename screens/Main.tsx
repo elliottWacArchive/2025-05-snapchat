@@ -28,6 +28,13 @@ const Main = ({ navigation }: any) => {
             >
                 <Text>Camera</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => {
+                    navigation.navigate("Messages");
+                }}
+            >
+                <Text>Messages</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -46,7 +53,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     cameraButton: {
-        backgroundColor: "#FFFC00",
+        backgroundColor: "#04ff60",
         paddingVertical: 12,
         paddingHorizontal: 30,
         borderRadius: 25,
@@ -98,7 +105,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: "hidden",
         borderWidth: 2,
-        borderColor: "#FFFC00",
+        borderColor: "#04ff60",
     },
     capturedImage: {
         width: "100%",

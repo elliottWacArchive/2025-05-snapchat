@@ -6,6 +6,7 @@ import LoginScreen from "./screens/Login";
 import RegisterScreen from "./screens/Register";
 import MainScreen from "./screens/Main";
 import CameraScreen from "./screens/Camera";
+import MessageScreen from "./screens/Messages";
 import { ActivityIndicator, View } from "react-native";
 // import { CameraProvider } from "react-native-camera-hooks";
 
@@ -14,6 +15,7 @@ type RootStackParamList = {
     Register: undefined;
     Main: undefined;
     Camera: undefined;
+    Messages: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -30,7 +32,7 @@ function Navigation() {
                     alignItems: "center",
                 }}
             >
-                <ActivityIndicator size="large" color="#FFFC00" />
+                <ActivityIndicator size="large" color="#04ff60" />
             </View>
         );
     }
@@ -56,6 +58,11 @@ function Navigation() {
                 <Stack.Screen
                     name="Camera"
                     component={CameraScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Messages"
+                    component={MessageScreen}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
