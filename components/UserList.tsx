@@ -9,6 +9,7 @@ import {
     Alert,
 } from "react-native";
 import axios from "axios";
+import Slider from "@react-native-community/slider";
 import { AuthContext } from "../context/AuthContext";
 import RNFS from "react-native-fs";
 
@@ -25,6 +26,7 @@ interface UserListProps {
 
 const UserList = ({ imagePath, onSnapSent }: UserListProps) => {
     const { userToken } = useContext(AuthContext);
+    const [snapDuration, setSnapDuration] = useState(5);
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -105,7 +107,7 @@ const UserList = ({ imagePath, onSnapSent }: UserListProps) => {
                 {
                     to: userId,
                     image: base64Image,
-                    duration: 5,
+                    duration: snapDuration,
                 },
                 {
                     headers: {
@@ -152,6 +154,22 @@ const UserList = ({ imagePath, onSnapSent }: UserListProps) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Choisir un destinataire</Text>
+            <View style={styles.durationContainer}>
+                <Text style={styles.durationLabel}>
+                    Durée d'affichage : {snapDuration} secondes
+                </Text>
+                <Slider
+                    style={styles.slider}
+                    minimumValue={1}
+                    maximumValue={10}
+                    step={1}
+                    value={snapDuration}
+                    onValueChange={(value) => setSnapDuration(value)}
+                    minimumTrackTintColor="#04ff60"
+                    maximumTrackTintColor="#ccc"
+                    thumbTintColor="#04ff60"
+                />
+            </View>
             <FlatList
                 data={users}
                 keyExtractor={(item) => item._id}
@@ -221,6 +239,23 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginTop: 20,
         color: "#777",
+    },
+    durationContainer: {
+        marginBottom: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 15,
+        backgroundColor: "#f7f7f7",
+        borderRadius: 8,
+    },
+    durationLabel: {
+        textAlign: "center",
+        marginBottom: 10,
+        fontSize: 15,
+        fontWeight: "500",
+    },
+    slider: {
+        width: "100%",
+        height: 40,
     },
 });
 

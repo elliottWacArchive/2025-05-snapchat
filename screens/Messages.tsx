@@ -7,6 +7,8 @@ import {
     FlatList,
     ActivityIndicator,
     Alert,
+    Modal,
+    Image,
     SafeAreaView,
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
@@ -24,10 +26,41 @@ const Messages = ({ navigation }: any) => {
     const [snaps, setSnaps] = useState<Snap[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [currentSnapImage, setCurrentSnapImage] = useState<string | null>(
+        null
+    );
+    const [snapLoading, setSnapLoading] = useState(false);
+    const [remainingTime, setRemainingTime] = useState(0);
+    const [currentSnapId, setCurrentSnapId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchSnaps();
     }, []);
+
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+
+        if (modalVisible && remainingTime > 0) {
+            timer = setInterval(() => {
+                setRemainingTime((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(timer);
+                        setModalVisible(false);
+                        if (currentSnapId) {
+                            markSnapAsSeen(currentSnapId);
+                        }
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+
+        return () => {
+            if (timer) clearInterval(timer);
+        };
+    }, [modalVisible, remainingTime, currentSnapId]);
 
     const fetchSnaps = async () => {
         if (!userToken) {
@@ -103,8 +136,62 @@ const Messages = ({ navigation }: any) => {
         });
     };
 
-    const handleOpenSnap = (snapId: string, username: string) => {
-        Alert.alert("Snap reçu", `Vous avez ouvert un snap de ${username}`);
+    const markSnapAsSeen = async (snapId: string) => {
+        if (!snapId || !userToken) return;
+
+        try {
+            await axios.put(
+                `https://snapchat.epihub.eu/snap/seen/${snapId}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                        "Content-Type": "application/json",
+                        "x-api-key":
+                            "CLE_API_SUPPRIMEE",
+                    },
+                }
+            );
+            console.log("Snap marqué comme vu:", snapId);
+        } catch (error) {
+            console.error("snapId", snapId, "userToken", userToken);
+            console.error("Erreur lors du marquage du snap comme vu:", error);
+        }
+    };
+
+    const handleOpenSnap = async (snapId: string, username: string) => {
+        try {
+            setSnapLoading(true);
+
+            const response = await axios.get(
+                `https://snapchat.epihub.eu/snap/${snapId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                        "Content-Type": "application/json",
+                        "x-api-key":
+                            "CLE_API_SUPPRIMEE",
+                    },
+                }
+            );
+
+            if (response.data && response.data.data) {
+                const snapData = response.data.data;
+                setCurrentSnapImage(snapData.image);
+                setCurrentSnapId(snapId);
+                setRemainingTime(snapData.duration || 5);
+                setModalVisible(true);
+
+                setTimeout(() => {
+                    fetchSnaps();
+                }, (snapData.duration || 5) * 1000 + 500);
+            }
+        } catch (error) {
+            console.error("Erreur lors de l'ouverture du snap:", error);
+            Alert.alert("Erreur", "Impossible d'ouvrir ce snap");
+        } finally {
+            setSnapLoading(false);
+        }
     };
 
     return (
@@ -128,6 +215,36 @@ const Messages = ({ navigation }: any) => {
                 </View>
             </View>
 
+            <Modal
+                animationType="slide"
+                transparent={false}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    if (currentSnapId) {
+                        markSnapAsSeen(currentSnapId);
+                    }
+                    setModalVisible(false);
+                }}
+            >
+                <View style={styles.modalContainer}>
+                    {currentSnapImage ? (
+                        <>
+                            <Image
+                                source={{ uri: currentSnapImage }}
+                                style={styles.snapImage}
+                            />
+                            <View style={styles.timerContainer}>
+                                <Text style={styles.timerText}>
+                                    {remainingTime}s
+                                </Text>
+                            </View>
+                        </>
+                    ) : (
+                        <ActivityIndicator size="large" color="#04ff60" />
+                    )}
+                </View>
+            </Modal>
+
             {loading ? (
                 <View style={styles.centered}>
                     <ActivityIndicator size="large" color="#04ff60" />
@@ -146,6 +263,7 @@ const Messages = ({ navigation }: any) => {
                             onPress={() =>
                                 handleOpenSnap(item._id, item.username || "")
                             }
+                            disabled={snapLoading}
                         >
                             <View style={styles.snapItemContent}>
                                 <View style={styles.snapInfo}>
@@ -157,7 +275,14 @@ const Messages = ({ navigation }: any) => {
                                     </Text>
                                 </View>
                                 <View style={styles.snapStatus}>
-                                    <View style={styles.unreadIndicator} />
+                                    {snapLoading ? (
+                                        <ActivityIndicator
+                                            size="small"
+                                            color="#04ff60"
+                                        />
+                                    ) : (
+                                        <View style={styles.unreadIndicator} />
+                                    )}
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -281,9 +406,34 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginRight: 10,
     },
-
     buttonIcon: {
         fontSize: 20,
+    },
+    modalContainer: {
+        flex: 1,
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    snapImage: {
+        width: "100%",
+        height: "100%",
+        resizeMode: "contain",
+        transform: [{ rotate: "-90deg" }],
+    },
+    timerContainer: {
+        position: "absolute",
+        top: 40,
+        right: 20,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 15,
+    },
+    timerText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
 
