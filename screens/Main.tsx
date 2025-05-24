@@ -35,6 +35,13 @@ const Main = ({ navigation }: any) => {
             >
                 <Text>Messages</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => {
+                    navigation.navigate("Settings");
+                }}
+            >
+                <Text>Paramètres</Text>
+            </TouchableOpacity>
         </View>
     );
 };

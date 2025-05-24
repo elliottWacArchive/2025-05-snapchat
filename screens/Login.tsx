@@ -49,12 +49,18 @@ const LoginScreen = ({ navigation }: any) => {
             const token = response.data.data.token;
             const username = response.data.data.username;
             const userId = response.data.data._id;
+            const userEmail = response.data.data.email;
+            const userPassword = userData.password;
+            const userImage = response.data.data.image || null;
 
-            console.log("Token:", token);
-            console.log("Username:", username);
-            console.log("User ID:", userId);
-
-            await setAuthData(token, username, userId);
+            await setAuthData(
+                token,
+                username,
+                userId,
+                userEmail,
+                userPassword,
+                userImage
+            );
             navigation.navigate("Main");
         } catch (error) {
             console.error("Erreur de connexion:", error);
