@@ -14,34 +14,75 @@ import {
 import { AuthContext } from "../context/AuthContext";
 
 const Main = ({ navigation }: any) => {
-    const { userName } = React.useContext(AuthContext);
+    const { userName, clearAuthData } = React.useContext(AuthContext);
 
+    const handleLogout = async () => {
+        try {
+            Alert.alert(
+                "Déconnexion",
+                "Êtes-vous sûr de vouloir vous déconnecter ?",
+                [
+                    {
+                        text: "Annuler",
+                        style: "cancel",
+                    },
+                    {
+                        text: "Déconnexion",
+                        onPress: async () => {
+                            await clearAuthData();
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: "Login" }],
+                            });
+                        },
+                    },
+                ]
+            );
+        } catch (error) {
+            console.error("Erreur lors de la déconnexion:", error);
+        }
+    };
     return (
         <View style={styles.container}>
             <Text style={styles.welcomeText}>
                 Bienvenue, {userName || "User"}!
             </Text>
-            <TouchableOpacity
-                onPress={() => {
-                    navigation.navigate("Camera");
-                }}
-            >
-                <Text>Camera</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => {
-                    navigation.navigate("Messages");
-                }}
-            >
-                <Text>Messages</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => {
-                    navigation.navigate("Settings");
-                }}
-            >
-                <Text>Paramètres</Text>
-            </TouchableOpacity>
+
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                        navigation.navigate("Camera");
+                    }}
+                >
+                    <Text style={styles.buttonText}>Caméra</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                        navigation.navigate("Messages");
+                    }}
+                >
+                    <Text style={styles.buttonText}>Messages</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                        navigation.navigate("Settings");
+                    }}
+                >
+                    <Text style={styles.buttonText}>Paramètres</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.button, styles.logoutButton]}
+                    onPress={handleLogout}
+                >
+                    <Text style={styles.logoutButtonText}>Déconnexion</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -117,6 +158,31 @@ const styles = StyleSheet.create({
     capturedImage: {
         width: "100%",
         height: "100%",
+    },
+    buttonContainer: {
+        width: "80%",
+    },
+    button: {
+        backgroundColor: "#04ff60",
+        paddingVertical: 12,
+        paddingHorizontal: 30,
+        borderRadius: 25,
+        marginBottom: 15,
+        alignItems: "center",
+    },
+    buttonText: {
+        color: "#000",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    logoutButton: {
+        backgroundColor: "#ff3b30",
+        marginTop: 20,
+    },
+    logoutButtonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
 

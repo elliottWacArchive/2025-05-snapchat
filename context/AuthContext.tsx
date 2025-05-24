@@ -14,7 +14,7 @@ type AuthContextType = {
         id: string,
         email: string,
         password: string,
-        image: string
+        image: string | null
     ) => Promise<void>;
     clearAuthData: () => Promise<void>;
     isLoading: boolean;
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         id: string,
         email: string,
         password: string,
-        image: string
+        image: string | null
     ) => {
         try {
             await AsyncStorage.setItem("userToken", token);
@@ -81,7 +81,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             await AsyncStorage.setItem("userId", id);
             await AsyncStorage.setItem("userEmail", email);
             await AsyncStorage.setItem("userPassword", password);
-            await AsyncStorage.setItem("userImage", image);
+            if (image) {
+                await AsyncStorage.setItem("userImage", image);
+            } else {
+                await AsyncStorage.setItem("userImage", "");
+            }
             setUserToken(token);
             setUserName(name);
             setUserId(id);
