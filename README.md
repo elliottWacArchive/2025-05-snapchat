@@ -2,7 +2,9 @@ This is a new [**React Native**](https://reactnative.dev) project
 
 
 
-[![forthebadge] (https://forthebadge.com/images/badges/built-by-developers.svg)](http://forthebadge.com)
+[![forthebadge] ()](http://forthebadge.com)
+
+[![forthebadge](https://forthebadge.com/images/badges/built-by-developers.svg)](http://forthebadge.com)  [![forthebadge](http://forthebadge.com/images/badges/powered-by-electricity.svg)](http://forthebadge.com)
 # Getting Started
 
 > **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
