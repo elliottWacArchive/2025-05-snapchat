@@ -1,13 +1,13 @@
-This is a new [**React Native**](https://reactnative.dev) project
+This is our new [**React Native**](https://reactnative.dev) project
 
 [![forthebadge](https://forthebadge.com/images/badges/built-by-developers.svg)](http://forthebadge.com)
 
-Petit récap d'un projet qui nous apprend à compiler du mobile.
-4 Folders 
-Assets
-Componentes
-Context
-Screens
+Petit récap d'un projet qui nous apprend à compiler du mobile.<br>
+4 Folders :<br>
+Assets<br>
+Componentes<br>
+Context<br>
+Screens<br>
 
 Un CRUD assurer par App.tsx
 
